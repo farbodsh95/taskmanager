@@ -1,0 +1,10 @@
+<!-- tasks/templates/tasks/confirm_delete.html -->
+{% extends 'base.html' %} {% block title %}Confirm Delete{% endblock %}
+{% block content %}
+<h2 class="mt-5">Are you sure you want to delete "{{ task.title }}"?</h2>
+<form method="POST">
+  {% csrf_token %}
+  <button type="submit" class="btn btn-danger">Yes, delete</button>
+  <a href="{% url 'task_list_view' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
