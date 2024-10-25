@@ -18,7 +18,6 @@
 </div>
 
 {% if user == task.user %}
-    <!-- Only show Edit and Delete buttons if the current user is the task owner -->
     <a href="{% url 'task_update_view' task.id %}" class="btn btn-primary mt-3">Edit Task</a>
     <a href="{% url 'task_delete_view' task.id %}" class="btn btn-danger mt-3">Delete Task</a>
 {% endif %}

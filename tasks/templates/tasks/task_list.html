@@ -1,4 +1,3 @@
-<!-- tasks/templates/tasks/task_list.html -->
 {% extends 'base.html' %} {% block title %}Task List{% endblock %}
 {% block content %}
 {% if user.is_authenticated %}
@@ -7,7 +6,6 @@
 <h2 class="mt-5">Task List</h2>
 
 
-<!-- Search Form -->
 <form method="GET" action="{% url 'task_list_view' %}" class="form-inline mb-4">
   <input
     class="form-control mr-sm-2"

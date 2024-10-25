@@ -1,4 +1,3 @@
-# from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
@@ -19,9 +18,7 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                return redirect(
-                    "task_list_view"
-                )  # Redirect to task list or wherever you'd like
+                return redirect("task_list_view")
             else:
                 messages.error(request, "Invalid username or password")
     else:
@@ -31,10 +28,10 @@ def user_login(request):
 
 def user_logout(request):
     logout(request)
-    return redirect("login")  # Redirect to the login page after logout
+    return redirect("login")
 
 
-# Task List View (with search functionality)
+# Task List View
 @login_required(login_url="/login")
 def task_list_view(request):
     query = request.GET.get("q")
@@ -48,21 +45,20 @@ def task_list_view(request):
 
 
 # Task Detail View
-# (allow non-owners to view, but restrict editing and deleting)
 @login_required(login_url="/login")
 def task_detail_view(request, pk):
     task = get_object_or_404(Task, pk=pk)
     return render(request, "tasks/task_detail.html", {"task": task})
 
 
-# Task Create View (users can create their own tasks)
+# Task Create View
 @login_required
 def task_create_view(request):
     if request.method == "POST":
         form = TaskForm(request.POST)
         if form.is_valid():
             task = form.save(commit=False)
-            task.user = request.user  # Ensure the task is created by the logged-in user
+            task.user = request.user
             task.save()
             return redirect("task_list_view")
     else:
@@ -77,10 +73,8 @@ def task_update_view(request, pk):
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
-            task = form.save()  # Save the updated task
-            return redirect(
-                "task_detail_view", pk=task.pk
-            )  # Redirect to detail view to show updated task
+            task = form.save()
+            return redirect("task_detail_view", pk=task.pk)
     else:
         form = TaskForm(instance=task)
     return render(request, "tasks/task_form.html", {"form": form})
@@ -96,7 +90,7 @@ def task_delete_view(request, pk):
     return render(request, "tasks/task_confirm_delete.html", {"task": task})
 
 
-# DRF-based API views
+# API views
 class TaskListCreateAPIView(generics.ListCreateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
