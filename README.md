@@ -38,7 +38,7 @@ Installation and Setup
         Run `python manage.py runserver`
 
     6. Visiting the Application:
-        Visit http://127.0.0.1:8000/tasks to see the application.
+        Visit http://127.0.0.1:8000/login and use your username & password to login and see the application.
 
     7. Running Tests (Optional):
         Run `python manage.py test`
