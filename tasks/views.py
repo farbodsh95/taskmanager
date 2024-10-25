@@ -35,7 +35,7 @@ def user_logout(request):
 
 
 # Task List View (with search functionality)
-@login_required
+@login_required(login_url="/login")
 def task_list_view(request):
     query = request.GET.get("q")
     if query:
@@ -49,7 +49,7 @@ def task_list_view(request):
 
 # Task Detail View
 # (allow non-owners to view, but restrict editing and deleting)
-@login_required
+@login_required(login_url="/login")
 def task_detail_view(request, pk):
     task = get_object_or_404(Task, pk=pk)
     return render(request, "tasks/task_detail.html", {"task": task})
@@ -71,7 +71,7 @@ def task_create_view(request):
 
 
 # Task Update View
-@login_required
+@login_required(login_url="/login")
 def task_update_view(request, pk):
     task = get_object_or_404(Task, pk=pk, user=request.user)
     if request.method == "POST":
@@ -87,7 +87,7 @@ def task_update_view(request, pk):
 
 
 # Task Delete View
-@login_required
+@login_required(login_url="/login")
 def task_delete_view(request, pk):
     task = get_object_or_404(Task, pk=pk, user=request.user)
     if request.method == "POST":
