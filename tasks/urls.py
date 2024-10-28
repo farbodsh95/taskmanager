@@ -9,11 +9,4 @@ urlpatterns = [
     path("tasks/create/", views.task_create_view, name="task_create_view"),
     path("tasks/<int:pk>/update/", views.task_update_view, name="task_update_view"),
     path("tasks/<int:pk>/delete/", views.task_delete_view, name="task_delete_view"),
-    # API views
-    path("api/tasks/", views.TaskListCreateAPIView.as_view(), name="task-list-create"),
-    path(
-        "api/tasks/<int:pk>/",
-        views.TaskRetrieveUpdateDestroyAPIView.as_view(),
-        name="task-retrieve-update-destroy",
-    ),
 ]

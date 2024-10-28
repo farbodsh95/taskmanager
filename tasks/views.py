@@ -6,7 +6,6 @@ from .models import Task
 from .forms import TaskForm, LoginForm
 from django.db.models import Q
 from rest_framework import generics, permissions
-from .serializers import TaskSerializer
 
 
 def user_login(request):
@@ -63,7 +62,7 @@ def task_create_view(request):
             return redirect("task_list_view")
     else:
         form = TaskForm()
-    return render(request, "tasks/task_form.html", {"form": form})
+    return render(request, "tasks/task_create_form.html", {"form": form})
 
 
 # Task Update View
@@ -73,11 +72,13 @@ def task_update_view(request, pk):
     if request.method == "POST":
         form = TaskForm(request.POST, instance=task)
         if form.is_valid():
-            task = form.save()
+            form.save()
             return redirect("task_detail_view", pk=task.pk)
     else:
         form = TaskForm(instance=task)
-    return render(request, "tasks/task_form.html", {"form": form})
+
+    # Render the update template
+    return render(request, "tasks/task_update_form.html", {"form": form, "task": task})
 
 
 # Task Delete View
@@ -88,25 +89,3 @@ def task_delete_view(request, pk):
         task.delete()
         return redirect("task_list_view")
     return render(request, "tasks/task_confirm_delete.html", {"task": task})
-
-
-# API views
-class TaskListCreateAPIView(generics.ListCreateAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-
-    def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)
-
-
-class TaskRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Task.objects.all()
-    serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get_queryset(self):
-        return Task.objects.filter(user=self.request.user)

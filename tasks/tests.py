@@ -1,8 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
-from rest_framework.test import APIClient
-from rest_framework import status
 from .models import Task
 from dotenv import load_dotenv
 import os
@@ -16,15 +14,11 @@ class TaskViewTestCase(TestCase):
         test_username = os.getenv("TEST_USER_NAME")
         test_password = os.getenv("TEST_USER_PASSWORD")
 
-        # Create a test user
+        # Create a test user and log them in
         self.user = User.objects.create_user(
             username=test_username, password=test_password
         )
         self.client.login(username=test_username, password=test_password)
-
-        # Set up the API client for DRF tests
-        self.api_client = APIClient()
-        self.api_client.force_authenticate(user=self.user)
 
         # Create some test tasks
         self.task1 = Task.objects.create(
@@ -48,7 +42,9 @@ class TaskViewTestCase(TestCase):
             "status": "Pending",
         }
         response = self.client.post(edit_url, updated_data)
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.status_code, 302
+        )  # Expect redirect after successful edit
         updated_task = Task.objects.get(pk=self.task1.pk)
         self.assertEqual(updated_task.title, "Updated Task 1")
         self.assertEqual(updated_task.description, "Updated description for task 1")
@@ -57,49 +53,7 @@ class TaskViewTestCase(TestCase):
         delete_url = reverse("task_delete_view", kwargs={"pk": self.task1.pk})
         self.assertTrue(Task.objects.filter(pk=self.task1.pk).exists())
         response = self.client.post(delete_url)
-        self.assertEqual(response.status_code, 302)
-        self.assertFalse(Task.objects.filter(pk=self.task1.pk).exists())
-
-    # API tests
-    def test_api_task_list(self):
-        response = self.api_client.get(reverse("task-list-create"))
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)
-        self.assertEqual(response.data[0]["title"], "Test Task 1")
-        self.assertEqual(response.data[1]["title"], "Test Task 2")
-
-    def test_api_task_create(self):
-        data = {
-            "title": "New Task",
-            "description": "Description for new task",
-            "status": "Pending",
-        }
-        response = self.api_client.post(reverse("task-list-create"), data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Task.objects.filter(title="New Task").exists())
-
-    def test_api_task_retrieve(self):
-        url = reverse("task-retrieve-update-destroy", kwargs={"pk": self.task1.pk})
-        response = self.api_client.get(url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["title"], "Test Task 1")
-
-    def test_api_task_update(self):
-        url = reverse("task-retrieve-update-destroy", kwargs={"pk": self.task1.pk})
-        data = {
-            "title": "Updated Task",
-            "description": "Updated description",
-            "status": "In Progress",
-        }
-        response = self.api_client.put(url, data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        updated_task = Task.objects.get(pk=self.task1.pk)
-        self.assertEqual(updated_task.title, "Updated Task")
-        self.assertEqual(updated_task.description, "Updated description")
-        self.assertEqual(updated_task.status, "In Progress")
-
-    def test_api_task_delete(self):
-        url = reverse("task-retrieve-update-destroy", kwargs={"pk": self.task1.pk})
-        response = self.api_client.delete(url)
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(
+            response.status_code, 302
+        )  # Expect redirect after successful delete
         self.assertFalse(Task.objects.filter(pk=self.task1.pk).exists())
